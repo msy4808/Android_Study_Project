@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,10 +14,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-    public void onButtonClicked(View v) {
-        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.naver.com"));
-        startActivity(myIntent);
+
+        Button btn1 = (Button) findViewById(R.id.button);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.naver.com"));
+                startActivity(myIntent);
+            }
+        });
     }
     public void onButtonClicked2(View v) {
         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:010-0000-1111"));
