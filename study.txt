@@ -16,7 +16,7 @@ android:layout_weight = "?"  <-- 사용법
 
 HTML에서 flex처럼 해당 공간을 ?의 비율로 설정하여 공간을 할당해줌
 
-텍스트 크기 --> 각 단말별 해상도가 다르므로 dp 단위를 사용. 해상도에 비율에 따라 비슷하게 설정되는 장점이 있음
+뷰 크기 --> 각 단말별 해상도가 다르므로 dp 단위를 사용. 해상도에 비율에 따라 비슷하게 설정되는 장점이 있음
 
 뷰의 위치는 절대값 X --> 과거에 사용되던 방법이지만 지금은 사용하지않음.
 
@@ -38,3 +38,130 @@ btn1.setLayoutParams(params); <-- 설정한 파라미터를 버튼에 부여
 mainLayout.addView(btn1); <-- 버튼을 레이아웃에 추가
 
 setContentView(mainLayout); <-- 레이아웃을 화면에 설정
+
+
+
+--프래그먼트
+
+프래그먼트의 사용목적 --> 분할된 화면들을 독립적으로 구성하기 위해서, 분할된 화면드르이 상태를 관리하기 위해서
+
+
+--메인 프래그먼트
+public class MainFragment extends Fragment {
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.main_fragment, container,false);
+        Button btn1 = view.findViewById(R.id.main_btn);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity main = (MainActivity) getActivity();
+                main.onChanged(0);
+            }
+        });
+        return view;
+    }
+}
+
+--메뉴 프래그먼트
+public class MenuFragment extends Fragment {
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.menu_fragment, container,false);
+
+        Button btn = view.findViewById(R.id.menu_btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity main = (MainActivity) getActivity();
+                main.onChanged(1);
+            }
+        });
+        return view;
+    }
+}
+
+--메인 액티비티
+public class MainActivity extends AppCompatActivity {
+    MainFragment main;
+    MenuFragment menu;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        main = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.main_f);
+        menu = new MenuFragment();
+    }
+    public void onChanged(int index) {
+        if(index == 0) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, menu).commit();
+        } else if(index == 1) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container,main).commit();
+        }
+    }
+}
+
+--메인 프래그먼트 XML
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="메인 프래그먼트"
+        android:textSize="30dp"
+        android:layout_centerInParent="true"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/main_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:text="메뉴화면으로"
+        android:textSize="30dp" />
+</RelativeLayout>
+
+--메뉴 프래그먼트 XML
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="메뉴 프래그먼트"
+        android:textSize="30dp" />
+
+    <Button
+        android:id="@+id/menu_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="메인화면으로"
+        android:textSize="30dp"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>
+
+--메인액티비티 XML
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container">
+
+   <fragment
+       android:id="@+id/main_f"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:name="moon.fragment_test.MainFragment"/>
+</RelativeLayout>
+
