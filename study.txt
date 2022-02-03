@@ -165,3 +165,32 @@ public class MainActivity extends AppCompatActivity {
        android:name="moon.fragment_test.MainFragment"/>
 </RelativeLayout>
 
+
+안드로이드 수명주기
+
+새로운 액티비티
+onCreate();
+onStart();
+onResume();
+	
+	↓
+
+실행
+onPause(); 일시중지(다른 액티비티가 상위로 오게된다면 호출)
+onResume(); 일시중지된 액티비티가 다시 실행될때 호출
+
+	↓
+
+중지
+onStop(); 중지상태로 변경될때 자동으로 호출됨
+
+	↓
+실행
+onRestart();
+onStart();
+onResume(); 중지상태에서 다시 실행상태로 변경될때 호출
+
+	↓
+소멸
+onDestroy();
+
