@@ -836,3 +836,52 @@ Rule of Thumb
 -예를 들어, Connection Pool, Logging, Thread Pool 등을 여러 곳에서 열람해야 하느 경우 사용하면 좋음
 
 
+Garbage Collection (GC)
+
+-Java는 GC를 이용해 메모리를 관리함
+
+-필요에 따라 GC가 실행되고, 그 과정에서 사용하지 않는 객체들을 정리해줌
+
+
+
+1. 자바에서는 Garbage Collection(또는 GC)를 이용하여 메모리를 정리한다.
+
+1-1. GC는 더이상 사용되지 않는 쓰레기 객체들을 정리하는 작업을 한다.
+
+1-2. GC는 필요에 따라 자동으로 실행된다. (2-2의 경우에 실행된다.)
+
+ 
+
+2. GC에 의해 관리되는 메모리는 Young과 Old로 나뉜다.
+
+2-1. Young은 3단계로 다시 나뉜다. (Eden, Survivor 1, Survivor 2)
+
+2-2. 객체가 GC에 의해 정리되지 않고 오래 살아남을수록 Eden -> Survivor 1 -> Survivor 2 -> Old로 이동된다.
+
+2-2. 각 메모리 영역에 할당된 메모리가 적정 수치를 넘었을 때 GC가 실행된다.
+
+ 
+
+3. GC는 Mark & Sweep 방식으로 동작한다.
+
+3-1. GC가 실행되면, 아래와 같이 외부에서 접근할 수 있는 객체들을 GC Root로 설정한다.
+
+- 실행 중인 쓰레드 (Active Thread)
+
+- 정적 변수 (Static Variable)
+
+- 로컬 변수 (Local Variable)
+
+- JNI 레퍼런스 (JNI Reference)
+
+3-2. GC Root에서 출발하여, 참조되고 있는 변수들을 순차적으로 Mark한다. (Mark)
+
+3-3. Mark되지 않은 객체들은 쓰레기 객체로 판정하고 정리한다. (Sweep)
+
+ 
+
+4. GC가 발생하는 동안은 stop-the-world 상태가 된다.
+4-1. 객체 참조를 정확히 판단해야 하기 때문에, GC 과정에서 참조가 변경되면 안 된다.
+
+4-2. 참조를 유지하기 위해 GC 실행시간 동안은 모든 작업이 멈춘다. (stop-the-world)
+
