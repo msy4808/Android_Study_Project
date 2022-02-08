@@ -885,3 +885,128 @@ Garbage Collection (GC)
 
 4-2. 참조를 유지하기 위해 GC 실행시간 동안은 모든 작업이 멈춘다. (stop-the-world)
 
+
+
+브로드캐스트 리시버 (BroadCast Receiver)
+
+-android 앱은 android 시스템 및 기타 android 앱에서 게시-구독 디자인 패턴과 유사한 브로드캐스트 메세지를 받거나 보낼 수 있음.
+
+-관심 있는 이벤트가 발생할 때 이러한 브로드캐스트가 전송됨.
+
+- 예를 들어, android 시스템은 시스템 부팅 또는 기기 충전 시작과 같은 다양한 시스템 이벤트가 발생할 때 브로드캐스트를 전송함. 
+
+- 또한 앱은 맞춤 브로드캐스트를 전송하여 다른 앱이 관심을 가질만한 사항(일부 새로운 데이터가 다운로드 됨...등등)을 관련 앱에 알릴 수 있음.
+
+-앱은 특정 브로드캐스트를 수신하도록 등록가능. 브로드캐스트가 전송되면 시스템은 특정 유형의 브로드캐스트를 수신하도록 신청한 앱에 브로드캐스트를 자동으로 라우팅함.
+
+- 일반적으로 브로드캐스트는 앱 전체와 일반 사용자 플로우 외부에서 메시징 시스템으로 사용될 수 있음.
+
+- 전원 충전, 전원 충전 해제, 비행기 모드 돌입, 애플리케이션 설치 완료 등의 다양한 이벤트들이 브로드캐스트에 해당.
+
+
+-대표적인 브로드캐스트들-
+
+ACTION_BOOT_COMPLETED
+- 부팅이 끝났을 때 (RECEIVE_BOOT_COMPLETED 권한 등록 필요)
+
+ACTION_CAMERA_BUTTON
+- 카메라 버튼이 눌렸을 때
+
+ACTION_DATE_CHANGED
+ACTION_TIME_CHANGED
+- 폰의 날짜, 시간이 수동으로 변했을 때 (설정에서 수정했을 때)
+
+ACTION_SCREEN_OFF
+ACTION_SCREEN_ON
+- 화면 on, off
+
+ACTION_AIRPLANE_MODE_CHANGED
+- 비행기 모드
+
+ACTION_BATTERY_CHANGED
+ACTION_BATTERY_LOW
+ACTION_BATTERY_OKAY
+- 배터리 상태변화
+
+ACTION_PACKAGE_ADDED
+ACTION_PACKAGE_CHANGED
+ACTION_PACKAGE_DATA_CLEARED
+ACTION_PACKAGE_INSTALL
+ACTION_PACKAGE_REMOVED
+ACTION_PACKAGE_REPLACED
+ACTION_PACKAGE_RESTARTED
+- 어플 설치/제거
+
+ACTION_POWER_CONNECTED
+ACTION_POWER_DISCONNECTED
+- 충전 관련
+
+ACTION_REBOOT
+ACTION_SHUTDOWN
+- 재부팅/종료
+
+ACTION_TIME_TICK
+- 매분마다 수신
+
+android.provider.Telephony.SMS_RECEIVED
+- sms 수신 (RECEIVE_SMS 권한 필요)
+
+
+사용법
+
+- 브로드캐스트리시버를 상속받은 클래스를 생성(.java파일)후 onReceive 메서드를 정의해줌
+
+// 전원연결 및 전원해제 시 Toast메시지를 띄운다
+public void onReceive(Context context, Intent intent) { 
+ 	if(Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
+		 Toast.makeText(context, "전원 연결", Toast.LENGTH_SHORT).show();
+	 } else if(Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) { 
+		 Toast.makeText(context, "전원 연결 해제", Toast.LENGTH_SHORT).show(); 
+	}
+ }
+
+
+- 또한 매니패스트에 정의를 해줘야 사용가능
+
+
+
+<!-- 브로드캐스트 리시버 정의 --> 
+<receiver 
+	android:name=".broadCastRece"  //클래스 이름
+	android:enabled="true" 
+	android:exported="true"> 
+	<intent-filter> 
+	//사용 할 이벤트들
+	<action android:name="android.intent.action.ACTION_POWER_CONNECTED" /> 
+	<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" /> 
+	</intent-filter> 
+</receiver>
+
+
+MainActivity.java 에서 호출
+
+public class MainActivity extends AppCompatActivity {
+    private BroadcastReceiver mReceiver; //리시버 선언
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mReceiver = new BroadCast(); //생성한 BroadCast 클래스를 브로드캐스트 리시버로 정의
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(); //특정 액션만(충전, 충전해제) 받을 수 있게 필터정의
+        filter.addAction(Intent.ACTION_POWER_CONNECTED);
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        registerReceiver(mReceiver, filter); //레지스트리로 리시버와 필터 지정
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver); //앱이 일시정지되면 리시버 삭제
+    }
+}
