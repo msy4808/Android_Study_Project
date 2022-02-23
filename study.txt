@@ -1219,12 +1219,52 @@ HTTP 프로토콜과 소켓
 
 코틀린의 변수 선언 방식
 
+- 코틀란에서는 명시적으로 null을 변수의 인자로 넣을 수 없음. 그런 구문이 있다면 complie time 에러를 발생시킴
+
 - 코틀린은 변수를 자바와 다르게 타입추론을 하여 선언하기에 자료형을 따로 선언할 필요 X
 
 - val 과 var 두가지의 선언 키워드가 존재하며 이 두 가지가 필요한 이유는 위에처럼 타입추론과 변수의 불변성을 보장하기 위해서
 
 - var 방식은 기존의 선언과 같지만 val 키워드는 자바의 final 키워드로 선언한 변수와 같이 상수로써 취급되어 처음의 초기화한 값에서 더이상 변하지 않고 변할수도 없는 변수가 됨
 
+- 변수의 타입 뒤에 ?를 붙여 null이 가능한 변수임을 명시적으로 표현가능
+
+ex) val x:String? = null
+
+- 또한 ?. 연산자를 사용하면 앞의 변수가 null이 아닐때만 오른쪽 함수가 수행되고 null이라면 null을 반환하게 할 수 있음
+
+ex) 
+	fun test(s:String?) {
+		val allCaps:String? = s?.toUpperCase()
+	}
+
+- 또한 ?: 연산자를 이용해 왼쪽항이 null일때 null이 아닌 원하는 default 값을 반환가능
+	(return 이나 throw도 넣을 수 있음)
+
+ex) 
+	fun getName(str: String?) { 
+		val name = str ?: "Unknown"
+	 }
+
+- as? 연산자를 통해 casting을 할때 타입이 맞지않으면(불가능하면) null을 반환함
+
+ex)
+	override fun equals(o: Any?): Boolean {
+		val otherPerson = o as? Person ?: return false  
+			//Person형으로 캐스팅 시도 후 안되면 false 반환
+
+		return otherPerson.firstName == firstName && 
+		otherPerson.lastName == lastName
+	 }
+
+
+- 이런식으로 nullable로 설정된 변수(property)와 관련된 연산자들이 있는데
+	항상 null처리(null인지 검사)를 해야해서 코드가 번잡해짐.
+- 이걸 해결하기위해 !! 연산자를 지원함
+
+ex) 
+	var str:String? = "dadad"
+	var str2:String = str!!
 
 
 val 
@@ -1378,3 +1418,57 @@ ex) public class MainApplication extends Application {
 - 매니패스트 파일에서 <application>태그 아래에 android:name=".MainApplication" 추가해줌
 
 - 앱에서 사용할 Application 클래스를 지정하는 속성임
+
+
+companion object
+
+- 코틀린에서 자바의 static 대신에 사용되는 오브젝트.
+
+- companion object 는 객체이며 사용법은 단순함
+
+ex) 중괄호 안에 멤버들(변수와 메소드)를 선언하면 됨
+  companion object{
+        lateinit var instance:MainApplication
+
+        fun getContext():Context {
+            return instance.applicationContext
+        }
+    }
+
+- 객체이므로 선언해서도 사용이 가능
+
+ex) val com1 = companion object를 가지고있는 클래스.Companion
+
+
+- 클래스내에서 Companion object 는 오직 하나만 쓸 수 있음
+
+
+lateinit 키워드
+
+- 늦은 초기화를 위해 쓰이는 키워드.
+
+- 선언하고자 하는 변수 앞에 lateinit 를 붙여서 사용가능
+
+- val은 값을 변경하지 못하는 키워드기에 var에서만 사용가능함
+
+- 말그대로 초기화를 뒤로 미뤄서 나중에 초기화를 하기위해 사용
+
+- 객체의 인스턴스를 생성후에 초기화가 필요한 경우가 있는데 이럴경우 사용됨
+
+ex) 
+
+	class MainApplication : Application() {
+    		init {
+        		instance = this  //MainApplication 인스턴스가 초기화될때 instance를 초기화해줌
+
+    		}
+
+    		companion object{
+         		lateinit var instance:MainApplication    //늦은 초기화를 위해 iateinit 선언
+
+        		fun getContext():Context {
+            		return instance.applicationContext
+        		}
+   		}
+	}
+
