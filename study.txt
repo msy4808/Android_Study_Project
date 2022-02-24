@@ -1472,3 +1472,37 @@ ex)
    		}
 	}
 
+
+
+Object
+
+- 코틀린에서 싱글턴 클래스로 만들때, 익명 클래스 객체를 생성할 때 object 키워드가 사용됨
+
+- 싱글턴 클래스를 정의하면 정의와 동시에 객체를 생성함
+
+- 객체이름을 통해 파라미터나 메서드에 바로 접근이 가능
+
+- object 객체 역시 다른 class를 상속하거나 인터페이스를 구현가능 
+
+ex) object Dataabase {	//코드블럭	}		<-- class 키워드 대신에 사용한다고 보면됨
+
+
+
+- 익명 클래스는 싱글턴이 아님. 따라서 호출시 매번 객체가 생성되고 익명 클래스 내에서 외부 클래스의 변수에 접근하여 값도 수정이 가능
+
+ex) 
+	interface ClickListener {
+ 		fun onClick()
+ 	} 
+	fun main(args: Array) 
+	{
+		setClickAction(object : ClickListener { 
+			override fun onClick() {
+				println("clicked!!!") } 
+		} ) 
+	} 
+	fun setClickAction(clickListener: ClickListener) {
+		clickListener.onClick() 
+	}
+
+
